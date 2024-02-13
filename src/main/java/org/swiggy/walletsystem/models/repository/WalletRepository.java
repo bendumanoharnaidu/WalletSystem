@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
-        List<Wallet> findByAmountGreaterThan(long amount);
-        List<Wallet> findByAmountLessThan(long amount);
-        List<Wallet> findByAmountBetween(long amount1, long amount2);
+//        List<Wallet> findByAmountGreaterThan(long amount);
+//        List<Wallet> findByAmountLessThan(long amount);
+//        List<Wallet> findByAmountBetween(long amount1, long amount2);
 }

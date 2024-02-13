@@ -1,13 +1,12 @@
 package org.swiggy.walletsystem.models.entites;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.swiggy.walletsystem.models.enums.Currency;
+
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +15,17 @@ import lombok.NoArgsConstructor;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private long amount;
+    private Long id;
+
+    @Embedded
+    private Money money;
+
+    public void deposit(BigDecimal amount, Currency currency) {
+
+        money.add(currency.convert(currency, amount));
+    }
+    public void withdraw(BigDecimal amount, Currency currency) {
+        money.subtract(currency.convert(currency, amount));
+    }
 
 }
