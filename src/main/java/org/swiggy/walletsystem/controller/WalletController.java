@@ -9,13 +9,15 @@ import org.swiggy.walletsystem.dto.request.WalletRequest;
 import org.swiggy.walletsystem.models.entites.Wallet;
 import org.swiggy.walletsystem.service.WalletServiceInterface;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/wallet")
 public class WalletController {
     @Autowired
     private WalletServiceInterface walletServiceInterface;
     @PostMapping("/createWallet")
-    public ResponseEntity<Wallet> createWallet() {
+    public ResponseEntity<WalletDto> createWallet() {
         return new ResponseEntity<>(walletServiceInterface.createWallet(), HttpStatus.CREATED);
     }
     @PutMapping("/{id}/addAmount")
@@ -26,19 +28,10 @@ public class WalletController {
     public ResponseEntity<WalletDto> deductAmount(@PathVariable long id, @RequestBody WalletRequest walletRequest) {
         return new ResponseEntity<>(walletServiceInterface.deductAmount(id, walletRequest.getAmount(), walletRequest.getCurrency()), HttpStatus.OK);
     }
+    @GetMapping("/getWallets")
+    public List<WalletDto> getAllWallets() {
+        return walletServiceInterface.getAllWallets();
+    }
 
-
-//    @GetMapping("/{id}/getAmount")
-//    public long getAmount(@PathVariable long id) {
-//        return walletServiceInterface.getAmount(id);
-//    }
-//    @DeleteMapping("/{id}/deleteWallet")
-//    public void deleteWallet(@PathVariable long id) {
-//        walletServiceInterface.deleteWallet(id);
-//    }
-//    @GetMapping("/{id}/getWallet")
-//    public WalletDto getWallet(@PathVariable long id) {
-//        return walletServiceInterface.getWallet(id);
-//    }
 
 }

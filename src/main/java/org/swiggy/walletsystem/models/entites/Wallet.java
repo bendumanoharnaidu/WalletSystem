@@ -9,7 +9,6 @@ import org.swiggy.walletsystem.models.enums.Currency;
 import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Wallet {
@@ -20,12 +19,15 @@ public class Wallet {
     @Embedded
     private Money money;
 
-    public void deposit(BigDecimal amount, Currency currency) {
-
-        money.add(currency.convert(currency, amount));
+    public Wallet() {
+        money = new Money(BigDecimal.ZERO, Currency.INR);
     }
-    public void withdraw(BigDecimal amount, Currency currency) {
-        money.subtract(currency.convert(currency, amount));
+
+    public void deposit(Money depositmoney) {
+        money.add(depositmoney);
+    }
+    public void withdraw(Money withdramoney) {
+        money.subtract(withdramoney);
     }
 
 }

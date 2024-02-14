@@ -32,6 +32,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
+    implementation("org.springframework.boot:spring-boot-starter-security:3.2.2")
+    testImplementation 'org.springframework.security:spring-security-test'
+
+
 
 }
 

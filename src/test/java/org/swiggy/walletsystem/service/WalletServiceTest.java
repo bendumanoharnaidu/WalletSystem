@@ -27,12 +27,10 @@ class WalletServiceTest {
     @Test
     void createWallet() {
         Wallet wallet = new Wallet();
-        Money money = new Money();
-        money.setAmount(BigDecimal.valueOf(100));
-        wallet.setMoney(money);
+
         when(walletRepository.findById(1L)).thenReturn(Optional.of(wallet));
         BigDecimal balance = walletService.getAmount(1L);
-        assertEquals(BigDecimal.valueOf(100), balance);
+        assertEquals(BigDecimal.valueOf(0), balance);
     }
     @Test
     void deductAmount() {

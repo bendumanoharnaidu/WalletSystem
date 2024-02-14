@@ -6,7 +6,7 @@ spring:
 
   datasource:
     username: Test
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb1
     driverClassName: org.h2.Driver
     password: '1234'
   jpa:
