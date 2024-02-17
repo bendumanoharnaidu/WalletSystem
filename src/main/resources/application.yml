@@ -1,14 +1,18 @@
 spring:
-  h2:
-    console:
-      enabled: 'true'
-      path: /h2
 
   datasource:
-    username: Test
-    url: jdbc:h2:mem:testdb1
-    driverClassName: org.h2.Driver
-    password: '1234'
+    url: jdbc:postgresql://localhost:5433/wallet
+    username: postgres
+    password: 12345
   jpa:
     hibernate:
       ddl-auto: create
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  logging:
+    level:
+      org:
+        springframework:
+          security: DEBUG

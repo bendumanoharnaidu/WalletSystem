@@ -2,11 +2,16 @@ package org.swiggy.walletsystem.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.swiggy.walletsystem.dto.WalletDto;
+import org.swiggy.walletsystem.dto.request.MoneyTransferRequest;
 import org.swiggy.walletsystem.dto.request.WalletRequest;
+import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
+import org.swiggy.walletsystem.dto.response.WalletResponse;
+import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.models.entites.Money;
+import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.models.entites.Wallet;
 import org.swiggy.walletsystem.models.enums.Currency;
+import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.models.repository.WalletRepository;
 
 import java.math.BigDecimal;
@@ -19,42 +24,75 @@ public class WalletService implements WalletServiceInterface {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
-    public WalletDto createWallet() {
-        Wallet wallet = new Wallet();
-        return toDto(walletRepository.save(wallet));
-    }
-    @Override
-    public WalletDto addAmount(long id, BigDecimal amount, Currency currency) {
-        Optional<Wallet> optionalWallet = walletRepository.findById(id);
-        if(optionalWallet.isPresent()){
-            Wallet wallet = optionalWallet.get();
-            wallet.deposit(new Money(amount, currency));
+    public WalletResponse addAmountToUser(String userName, WalletRequest walletRequest) {
+        Optional<UserModel> optionalUser = userRepository.findByUsername(userName);
+        if(optionalUser.isPresent()){
+            UserModel user = optionalUser.get();
+            Wallet wallet = user.getWallet();
+            wallet.deposit(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
             wallet = walletRepository.save(wallet);
             return toDto(wallet);
         }
-        return null;
+        else {
+            throw new RuntimeException("User not found");
+        }
     }
+
     @Override
-    public WalletDto deductAmount(long id, BigDecimal amount, Currency currency) {
-        Optional<Wallet> wallet = walletRepository.findById(id);
-        if(wallet.isPresent()){
-            Wallet wallet1 = wallet.get();
-            if (wallet1.getMoney().getAmount().compareTo(amount) < 0) {
+    public WalletResponse deductAmountFromUser(String userName, WalletRequest walletRequest) throws InsufficientMoneyException {
+        Optional<UserModel> optionalUser = userRepository.findByUsername(userName);
+        if(optionalUser.isPresent()) {
+            UserModel user = optionalUser.get();
+            Wallet wallet = user.getWallet();
+            if (wallet.getMoney().getAmount().compareTo(walletRequest.getAmount()) < 0) {
                 throw new RuntimeException("Insufficient balance");
             }
-            wallet1.withdraw(new Money(amount, currency));
-            wallet1 =  walletRepository.save(wallet1);
-            return toDto(wallet1);
+            wallet.withdraw(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
+            wallet = walletRepository.save(wallet);
+            return toDto(wallet);
         }
-        return null;
+        else {
+            throw new RuntimeException("User not found");
+        }
     }
-    public static WalletDto toDto(Wallet wallet) {
-        WalletDto walletDto = new WalletDto();
-        walletDto.setAmount(wallet.getMoney().getAmount());
-        walletDto.setCurrency(wallet.getMoney().getCurrency());
-        return walletDto;
+
+    @Override
+    public List<WalletResponse> getAllWallets() {
+        List<Wallet> walletList = walletRepository.findAll();
+        if (walletList.isEmpty()) {
+            throw new RuntimeException("No wallets found");
+        }
+        return walletList.stream().map(WalletService::toDto).toList();
     }
+
+    @Override
+    public MoneyTransferResponse transferAmountToUser(String username, String otherUser, MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException {
+        Optional<UserModel> optionalUser = userRepository.findByUsername(username);
+        Optional<UserModel> optionalOtherUser = userRepository.findByUsername(otherUser);
+
+        if(optionalUser.isPresent() && optionalOtherUser.isPresent()) {
+            UserModel user = optionalUser.get();
+            UserModel otherUserModel = optionalOtherUser.get();
+            Wallet wallet = user.getWallet();
+            Wallet otherWallet = otherUserModel.getWallet();
+            if (wallet.getMoney().getAmount().compareTo(BigDecimal.valueOf(moneyTransferRequest.getAmount())) < 0) {
+                throw new RuntimeException("Insufficient balance");
+            }
+            wallet.withdraw(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
+            otherWallet.deposit(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
+            walletRepository.save(wallet);
+            walletRepository.save(otherWallet);
+            return new MoneyTransferResponse("Amount transferred successfully");
+        }
+        else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
     @Override
     public BigDecimal getAmount(long id) {
         Optional<Wallet> wallet = walletRepository.findById(id);
@@ -64,14 +102,12 @@ public class WalletService implements WalletServiceInterface {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    public List<WalletDto> getAllWallets() {
-        List<Wallet> walletList = walletRepository.findAll();
-        if (walletList.isEmpty()) {
-            throw new RuntimeException("No wallets found");
-        }
-        return walletList.stream().map(WalletService::toDto).toList();
+    public static WalletResponse toDto(Wallet wallet) {
+        WalletResponse walletResponse = new WalletResponse();
+        walletResponse.setWalletId(wallet.getId());
+        walletResponse.setAmount(wallet.getMoney().getAmount());
+        walletResponse.setCurrency(wallet.getMoney().getCurrency());
+        return walletResponse;
     }
-
 
 }

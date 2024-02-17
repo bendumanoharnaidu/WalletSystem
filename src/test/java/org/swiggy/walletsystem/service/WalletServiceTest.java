@@ -1,13 +1,11 @@
 package org.swiggy.walletsystem.service;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.swiggy.walletsystem.dto.WalletDto;
+import org.swiggy.walletsystem.dto.response.WalletResponse;
+import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.models.entites.Money;
 import org.swiggy.walletsystem.models.entites.Wallet;
 import org.swiggy.walletsystem.models.enums.Currency;
@@ -33,7 +31,7 @@ class WalletServiceTest {
         assertEquals(BigDecimal.valueOf(0), balance);
     }
     @Test
-    void deductAmount() {
+    void deductAmount() throws InsufficientMoneyException {
         Wallet wallet = new Wallet();
         Money money = new Money();
         money.setAmount(BigDecimal.valueOf(100));
@@ -41,8 +39,8 @@ class WalletServiceTest {
         when(walletRepository.findById(1L)).thenReturn(Optional.of(wallet));
         BigDecimal deductAmount = BigDecimal.valueOf(20);
         when(walletRepository.save(wallet)).thenReturn(wallet);
-        WalletDto walletDto = walletService.deductAmount(1L,deductAmount, Currency.INR);
-        assertEquals(BigDecimal.valueOf(80.0), walletDto.getAmount());
+        WalletResponse walletResponse = walletService.deductAmount(1L,deductAmount, Currency.INR);
+        assertEquals(BigDecimal.valueOf(80.0), walletResponse.getAmount());
     }
     @Test
     void testAddAmount() {
@@ -53,8 +51,8 @@ class WalletServiceTest {
         when(walletRepository.findById(1L)).thenReturn(Optional.of(wallet));
         BigDecimal depositAmount = BigDecimal.valueOf(20);
             when(walletRepository.save(wallet)).thenReturn(wallet);
-        WalletDto walletDto = walletService.addAmount(1L,depositAmount, Currency.INR);
-        assertEquals(BigDecimal.valueOf(20.0), walletDto.getAmount());
+        WalletResponse walletResponse = walletService.addAmount(1L,depositAmount, Currency.INR);
+        assertEquals(BigDecimal.valueOf(20.0), walletResponse.getAmount());
     }
 
 

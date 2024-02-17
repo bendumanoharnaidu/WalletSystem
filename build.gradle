@@ -34,6 +34,12 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
     implementation("org.springframework.boot:spring-boot-starter-security:3.2.2")
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '6.2.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '6.2.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '6.2.1'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.1'
+    implementation 'org.postgresql:postgresql'
+
 
 
 
