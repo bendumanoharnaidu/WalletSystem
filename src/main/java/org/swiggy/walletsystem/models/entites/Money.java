@@ -29,14 +29,12 @@ public class Money {
     public void withdraw(Money withdrawAmount) throws InsufficientMoneyException {
 
         BigDecimal amountInBase = Currency.convert(withdrawAmount.getCurrency(), withdrawAmount.getAmount());
-        System.out.println(amountInBase);
 
         if(withdrawAmount.getAmount().compareTo(amountInBase) < 0) {
             throw new InsufficientMoneyException("Insufficient balance");
         }
 
         this.amount = this.amount.subtract(amountInBase);
-        System.out.println(this.amount);
     }
 
 }

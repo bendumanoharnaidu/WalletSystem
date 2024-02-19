@@ -11,6 +11,7 @@ import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.dto.request.WalletRequest;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
+import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.service.UserServiceInterface;
 import org.swiggy.walletsystem.service.WalletServiceInterface;
 
@@ -34,7 +35,7 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.addAmountToUser(username, walletRequest), HttpStatus.OK);
     }
     @PutMapping("/user/withdraw")
-    public ResponseEntity<WalletResponse> withdrawAmountFromUser(@RequestBody WalletRequest walletRequest) throws InsufficientMoneyException {
+    public ResponseEntity<WalletResponse> withdrawAmountFromUser(@RequestBody WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -42,7 +43,7 @@ public class WalletController {
     }
 
     @PutMapping("user/deposit/{otherUser}")
-    public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@PathVariable String otherUser, @RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException {
+    public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@PathVariable String otherUser, @RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -51,8 +52,6 @@ public class WalletController {
 
     @GetMapping("/fetchWallets")
     public List<WalletResponse> fetchWallets() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         return walletServiceInterface.getAllWallets();
     }
 

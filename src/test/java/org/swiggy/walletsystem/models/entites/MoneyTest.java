@@ -23,7 +23,7 @@ class MoneyTest {
         Money money1 = new Money(new BigDecimal("1"), Currency.USD);
         money.deposit(money1);
 
-        assertEquals(new Money(new BigDecimal("180.0"), Currency.USD), money);
+        assertEquals(new Money(new BigDecimal("180.0"), Currency.INR), money);
     }
     @Test
     void moneyWithnegativeAmount() {
@@ -49,15 +49,25 @@ class MoneyTest {
         try {
             money.withdraw(money1);
         } catch (InsufficientMoneyException e) {
-            assertEquals("Amount cannot be negative", e.getMessage());
+            assertEquals("Insufficient balance", e.getMessage());
         }
     }
-//    @Test
-//    public void subtractTwoValidDifferentMoney() {
-//        Money money = new Money(new BigDecimal("100"), Currency.INR);
-//        Money money1 = new Money(new BigDecimal("1"), Currency.USD);
-//        money.subtract(money1);
-//
-//        assertEquals(new Money(new BigDecimal("20.0"), Currency.INR), money);
-//    }
+    @Test
+    public void subtractMoneyWithNegativeAmount() throws InsufficientMoneyException {
+        Money money = new Money(new BigDecimal("200"), Currency.INR);
+        Money money1 = new Money(new BigDecimal("120"), Currency.INR);
+        money.withdraw(money1);
+        assertEquals(new Money(new BigDecimal("80.0"), Currency.INR), money);
+
+    }
+    @Test
+    public void subtractMoneyWithNegativeAmountInBase() {
+        Money money = new Money(new BigDecimal("200"), Currency.INR);
+        Money money1 = new Money(new BigDecimal("-120"), Currency.INR);
+        try {
+            money.withdraw(money1);
+        } catch (InsufficientMoneyException e) {
+            assertEquals("Insufficient balance", e.getMessage());
+        }
+    }
 }

@@ -7,6 +7,7 @@ import org.swiggy.walletsystem.dto.request.WalletRequest;
 import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
+import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.Money;
 import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.models.entites.Wallet;
@@ -34,8 +35,9 @@ public class WalletService implements WalletServiceInterface {
             UserModel user = optionalUser.get();
             Wallet wallet = user.getWallet();
             wallet.deposit(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
-            wallet = walletRepository.save(wallet);
-            return toDto(wallet);
+
+            Wallet returnedWallet = walletRepository.save(wallet);
+            return toDto(returnedWallet);
         }
         else {
             throw new RuntimeException("User not found");
@@ -43,20 +45,20 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public WalletResponse deductAmountFromUser(String userName, WalletRequest walletRequest) throws InsufficientMoneyException {
+    public WalletResponse deductAmountFromUser(String userName, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
         Optional<UserModel> optionalUser = userRepository.findByUsername(userName);
         if(optionalUser.isPresent()) {
             UserModel user = optionalUser.get();
             Wallet wallet = user.getWallet();
             if (wallet.getMoney().getAmount().compareTo(walletRequest.getAmount()) < 0) {
-                throw new RuntimeException("Insufficient balance");
+                throw new InsufficientMoneyException("Insufficient balance");
             }
             wallet.withdraw(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
             wallet = walletRepository.save(wallet);
             return toDto(wallet);
         }
         else {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
@@ -70,7 +72,7 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public MoneyTransferResponse transferAmountToUser(String username, String otherUser, MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException {
+    public MoneyTransferResponse transferAmountToUser(String username, String otherUser, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException {
         Optional<UserModel> optionalUser = userRepository.findByUsername(username);
         Optional<UserModel> optionalOtherUser = userRepository.findByUsername(otherUser);
 
@@ -89,7 +91,7 @@ public class WalletService implements WalletServiceInterface {
             return new MoneyTransferResponse("Amount transferred successfully");
         }
         else {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 

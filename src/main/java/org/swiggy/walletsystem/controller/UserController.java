@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.swiggy.walletsystem.dto.request.UserRequest;
+import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
+import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.service.UserServiceInterface;
 
@@ -18,21 +20,21 @@ public class UserController {
     private UserServiceInterface userServiceInterface;
 
     @PostMapping("/register")
-    public ResponseEntity<UserModel> registerUser(@RequestBody UserRequest request) {
-        UserModel userModel = userServiceInterface.registerUser(request.getUsername(), request.getPassword());
+    public ResponseEntity<UserModel> registerUser(@RequestBody UserRequest request) throws UserAlreadyPresentException {
+        UserModel userModel = userServiceInterface.registerUser(request);
         return new ResponseEntity<>(userModel, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser() {
+    public ResponseEntity<String> deleteUser() throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        if(authentication.isAuthenticated() && userServiceInterface.isUserPresent(username)) {
-            userServiceInterface.deleteUser(username);
-            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+        if(authentication.isAuthenticated()) {
+            String response = userServiceInterface.deleteUser(username);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 }

@@ -3,6 +3,9 @@ package org.swiggy.walletsystem.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.swiggy.walletsystem.dto.request.UserRequest;
+import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
+import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.models.entites.Wallet;
 import org.swiggy.walletsystem.models.repository.UserRepository;
@@ -17,22 +20,25 @@ public class UserService implements UserServiceInterface {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    public UserModel registerUser(String username, String password) {
-
-        UserModel userModel = new UserModel(username, passwordEncoder.encode(password), new Wallet());
+    public UserModel registerUser(UserRequest userRequest) throws UserAlreadyPresentException {
+        if (isUserPresent(userRequest.getUsername())) {
+            throw new UserAlreadyPresentException("User already present");
+        }
+        UserModel userModel = new UserModel(userRequest.getUsername() , passwordEncoder.encode(userRequest.getPassword()), new Wallet());
         return userRepository.save(userModel);
     }
     public boolean isUserPresent(String username) {
         Optional<UserModel> userModel = userRepository.findByUsername(username);
         return userModel.isPresent();
     }
-    public void deleteUser(String username) {
+    public String deleteUser(String username) throws UserNotFoundException {
         Optional<UserModel> userModel = userRepository.findByUsername(username);
         if(userModel.isPresent()) {
             userRepository.delete(userModel.get());
+            return "User deleted successfully";
         }
         else {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
