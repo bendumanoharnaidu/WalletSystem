@@ -2,6 +2,7 @@ package org.swiggy.walletsystem.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.swiggy.walletsystem.dto.projections.TransactionDetailProjection;
 import org.swiggy.walletsystem.dto.response.TransactionResponse;
 import org.swiggy.walletsystem.models.entites.Transaction;
 import org.swiggy.walletsystem.models.entites.UserModel;
@@ -24,7 +25,7 @@ public class TransactionService implements TransactionServiceInterface{
     public TransactionResponse fetchallTransactions(String username) {
         Optional<UserModel> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
-            List<Transaction> transactions = transactionRepository.findBySenderOrReceiver(optionalUser.get().getId());
+            List<TransactionDetailProjection> transactions = transactionRepository.findTransactionDetailsByUserId(optionalUser.get().getId());
             return TransactionResponse.builder().transactions(transactions).build();
         }
         return null;
@@ -36,7 +37,7 @@ public class TransactionService implements TransactionServiceInterface{
         LocalDateTime endDateTime = LocalDateTime.parse(end);
         Optional<UserModel> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
-            List<Transaction> transactions = transactionRepository.findTransactionBetweenTimestamps(optionalUser.get().getId(), startDateTime, endDateTime);
+            List<TransactionDetailProjection> transactions = transactionRepository.findTransactionBetweenTimestamps(optionalUser.get().getId(), startDateTime, endDateTime);
             return TransactionResponse.builder().transactions(transactions).build();
         }
         return null;

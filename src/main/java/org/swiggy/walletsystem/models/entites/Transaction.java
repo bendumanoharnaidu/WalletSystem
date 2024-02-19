@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long transactionId;
+    private Long transactionId;
 
     @Embedded
     private Money money;
