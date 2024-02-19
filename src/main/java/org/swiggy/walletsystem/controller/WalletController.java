@@ -42,12 +42,12 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletRequest), HttpStatus.OK);
     }
 
-    @PutMapping("user/deposit/{otherUser}")
-    public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@PathVariable String otherUser, @RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
+    @PutMapping("user/deposit/toUser")
+    public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        return new ResponseEntity<>(walletServiceInterface.transferAmountToUser(username, otherUser, moneyTransferRequest), HttpStatus.OK);
+        return new ResponseEntity<>(walletServiceInterface.transferAmountToUser(username,    moneyTransferRequest), HttpStatus.OK);
     }
 
     @GetMapping("/fetchWallets")

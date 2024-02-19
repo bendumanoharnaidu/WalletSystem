@@ -9,13 +9,16 @@ import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.Money;
+import org.swiggy.walletsystem.models.entites.Transaction;
 import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.models.entites.Wallet;
 import org.swiggy.walletsystem.models.enums.Currency;
+import org.swiggy.walletsystem.models.repository.TransactionRepository;
 import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.models.repository.WalletRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +27,8 @@ public class WalletService implements WalletServiceInterface {
 
     @Autowired
     private WalletRepository walletRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -72,22 +77,35 @@ public class WalletService implements WalletServiceInterface {
     }
 
     @Override
-    public MoneyTransferResponse transferAmountToUser(String username, String otherUser, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException {
-        Optional<UserModel> optionalUser = userRepository.findByUsername(username);
-        Optional<UserModel> optionalOtherUser = userRepository.findByUsername(otherUser);
+    public MoneyTransferResponse transferAmountToUser(String username, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException {
+        Optional<UserModel> currentUser = userRepository.findByUsername(username);
+        Optional<UserModel> otherUser = userRepository.findByUsername(moneyTransferRequest.getToUser());
 
-        if(optionalUser.isPresent() && optionalOtherUser.isPresent()) {
-            UserModel user = optionalUser.get();
-            UserModel otherUserModel = optionalOtherUser.get();
+        if(currentUser.isPresent() && otherUser.isPresent()) {
+            UserModel user = currentUser.get();
+            UserModel otherUserModel = otherUser.get();
+
             Wallet wallet = user.getWallet();
             Wallet otherWallet = otherUserModel.getWallet();
+
             if (wallet.getMoney().getAmount().compareTo(BigDecimal.valueOf(moneyTransferRequest.getAmount())) < 0) {
-                throw new RuntimeException("Insufficient balance");
+                throw new InsufficientMoneyException("Insufficient balance");
             }
+
             wallet.withdraw(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
             otherWallet.deposit(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
             walletRepository.save(wallet);
             walletRepository.save(otherWallet);
+            // save transaction
+            Money money = new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency()));
+            Transaction transaction = Transaction.builder()
+                    .sender(user)
+                    .receiver(otherUserModel)
+                    .money(money)
+                    .date(LocalDateTime.now())
+                    .build();
+            transactionRepository.save(transaction);
+
             return new MoneyTransferResponse("Amount transferred successfully");
         }
         else {

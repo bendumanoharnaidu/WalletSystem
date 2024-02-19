@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class MoneyTransferRequest {
-    private String toUser;
-    private String currency;
-    private double amount;
+public class TransactionRequest {
+    private String username;
 }

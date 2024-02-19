@@ -6,8 +6,6 @@ import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
-import org.swiggy.walletsystem.models.enums.Currency;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -21,5 +19,5 @@ public interface WalletServiceInterface {
 
     List<WalletResponse> getAllWallets();
 
-    MoneyTransferResponse transferAmountToUser(String username, String otherUser, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException;
+    MoneyTransferResponse transferAmountToUser(String username, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException;
 }
