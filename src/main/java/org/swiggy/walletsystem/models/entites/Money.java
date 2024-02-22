@@ -32,7 +32,7 @@ public class Money {
         BigDecimal amountInBase = Currency.convert(withdrawAmount.getCurrency(), withdrawAmount.getAmount());
         BigDecimal conversionValue = BigDecimal.valueOf(currency.getConversionRate());
 
-        if(withdrawAmount.getAmount().compareTo(amountInBase.multiply(conversionValue)) < 0) {
+        if(this.amount.compareTo(amountInBase.multiply(conversionValue)) < 0) {
             throw new InsufficientMoneyException("Insufficient balance");
 
         }
