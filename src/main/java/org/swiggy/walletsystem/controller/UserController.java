@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.swiggy.walletsystem.dto.request.UserRequest;
+import org.swiggy.walletsystem.dto.request.WalletRequest;
+import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.UserModel;
@@ -37,4 +39,13 @@ public class UserController {
             throw new UserNotFoundException("User not found");
         }
     }
+
+    @PostMapping("/add-wallet-to-user")
+    public ResponseEntity<UserModel> addWalletToUser() throws UserNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserModel userModel = userServiceInterface.addWalletToUser(username);
+        return new ResponseEntity<>(userModel, HttpStatus.OK);
+    }
+
 }

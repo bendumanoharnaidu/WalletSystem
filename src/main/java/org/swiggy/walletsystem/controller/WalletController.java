@@ -43,9 +43,10 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletRequest), HttpStatus.OK);
     }
 
-    @GetMapping("/")
-    public List<WalletResponse> fetchWallets() {
-        return walletServiceInterface.getAllWallets();
+    @GetMapping("/user-wallets")
+    public List<WalletResponse> fetchWallets(@RequestParam String username) {
+        return walletServiceInterface.getAllWallets(username);
     }
+
 
 }

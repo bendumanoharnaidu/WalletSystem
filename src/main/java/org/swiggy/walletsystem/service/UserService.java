@@ -40,8 +40,23 @@ public class UserService implements UserServiceInterface {
     public String deleteUser(String username) throws UserNotFoundException {
         Optional<UserModel> userModel = userRepository.findByUsername(username);
         if(userModel.isPresent()) {
-            userRepository.delete(userModel.get());
+            userModel.get().setActive(false);
+//            walletRepository.deleteAll(userModel.get().getWallets());
+//            userRepository.delete(userModel.get());
             return "User deleted successfully";
+        }
+        else {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
+    @Override
+    public UserModel addWalletToUser(String username) throws UserNotFoundException {
+        Optional<UserModel> userModel = userRepository.findByUsername(username);
+        if(userModel.isPresent()) {
+            UserModel user = userModel.get();
+            user.addWallet(new Wallet(user.getWallets().get(0).getMoney().getCurrency()));
+            return userRepository.save(user);
         }
         else {
             throw new UserNotFoundException("User not found");

@@ -23,7 +23,7 @@ public class Money {
         }
         BigDecimal amountInBase = Currency.convert(depositAmount.getCurrency(), depositAmount.getAmount());
         BigDecimal conversionValue = BigDecimal.valueOf(currency.getConversionRate());
-        this.amount = this.amount.add(amountInBase.multiply(conversionValue));
+        this.amount = this.amount.add(amountInBase.divide(conversionValue));
 
     }
 
@@ -32,11 +32,11 @@ public class Money {
         BigDecimal amountInBase = Currency.convert(withdrawAmount.getCurrency(), withdrawAmount.getAmount());
         BigDecimal conversionValue = BigDecimal.valueOf(currency.getConversionRate());
 
-        if(this.amount.compareTo(amountInBase.multiply(conversionValue)) < 0) {
+        if(this.amount.compareTo(amountInBase.divide(conversionValue)) < 0) {
             throw new InsufficientMoneyException("Insufficient balance");
 
         }
-        this.amount = this.amount.subtract(amountInBase.multiply(conversionValue));
+        this.amount = this.amount.subtract(amountInBase.divide(conversionValue));
     }
 
 }

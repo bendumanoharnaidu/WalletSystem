@@ -2,12 +2,14 @@ package org.swiggy.walletsystem.models.entites;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.models.enums.Currency;
 
 import java.math.BigDecimal;
 
+@Builder
 @Data
 @AllArgsConstructor
 @Entity
@@ -18,6 +20,11 @@ public class Wallet {
 
     @Embedded
     private Money money;
+
+    @Builder.Default
+    @Column(name = "isActive")
+    private boolean isActive = true;
+
     public Wallet() {}
 
     public Wallet(Currency currency) {

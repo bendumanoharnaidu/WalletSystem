@@ -17,7 +17,8 @@ public interface WalletServiceInterface {
 
     BigDecimal getAmount(long id);
 
-    List<WalletResponse> getAllWallets();
+    List<WalletResponse> getAllWallets(String username);
 
     MoneyTransferResponse transferAmountToUser(String username, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException;
+
 }

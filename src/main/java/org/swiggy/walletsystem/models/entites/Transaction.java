@@ -29,4 +29,8 @@ public class Transaction {
     @Column(name = "date")
     private LocalDateTime date;
 
+    @Builder.Default
+    @Column(name = "isActive")
+    private boolean isActive=true;
+
 }
