@@ -8,6 +8,7 @@ import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
 import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.models.entites.Wallet;
+import org.swiggy.walletsystem.models.enums.Currency;
 import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.models.repository.WalletRepository;
 
@@ -24,7 +25,11 @@ public class UserService implements UserServiceInterface {
         if (isUserPresent(userRequest.getUsername())) {
             throw new UserAlreadyPresentException("User already present");
         }
-        UserModel userModel = new UserModel(userRequest.getUsername() , passwordEncoder.encode(userRequest.getPassword()), new Wallet());
+        Currency currency = Currency.getCurrency(userRequest.getLocation());
+        UserModel userModel = new UserModel(userRequest.getUsername() ,
+                passwordEncoder.encode(userRequest.getPassword()),
+                new Wallet(currency));
+
         return userRepository.save(userModel);
     }
     public boolean isUserPresent(String username) {

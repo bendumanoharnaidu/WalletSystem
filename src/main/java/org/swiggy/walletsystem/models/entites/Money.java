@@ -14,27 +14,29 @@ public class Money {
     private BigDecimal amount ;
 
     @Enumerated
-    private Currency currency = Currency.INR;
+    private Currency currency;
 
     public void deposit(Money depositAmount) {
 
         if(depositAmount.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
+        BigDecimal amountInBase = Currency.convert(depositAmount.getCurrency(), depositAmount.getAmount());
+        BigDecimal conversionValue = BigDecimal.valueOf(currency.getConversionRate());
+        this.amount = this.amount.add(amountInBase.multiply(conversionValue));
 
-        this.amount = this.amount.add(Currency
-                .convert(depositAmount.getCurrency(),
-                depositAmount.getAmount()));
     }
+
     public void withdraw(Money withdrawAmount) throws InsufficientMoneyException {
 
         BigDecimal amountInBase = Currency.convert(withdrawAmount.getCurrency(), withdrawAmount.getAmount());
+        BigDecimal conversionValue = BigDecimal.valueOf(currency.getConversionRate());
 
-        if(withdrawAmount.getAmount().compareTo(amountInBase) < 0) {
+        if(withdrawAmount.getAmount().compareTo(amountInBase.multiply(conversionValue)) < 0) {
             throw new InsufficientMoneyException("Insufficient balance");
-        }
 
-        this.amount = this.amount.subtract(amountInBase);
+        }
+        this.amount = this.amount.subtract(amountInBase.multiply(conversionValue));
     }
 
 }

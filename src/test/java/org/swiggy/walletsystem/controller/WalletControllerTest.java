@@ -67,13 +67,14 @@ class WalletControllerTest {
 
         when(walletServiceInterface.addAmountToUser(anyString(), any())).thenReturn(walletResponse);
 
-        this.mockMvc.perform(put("/wallet/user/deposit")
+        this.mockMvc.perform(put("/wallet/deposit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(walletRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(100));
         verify(walletServiceInterface, times(1)).addAmountToUser(anyString(), any());
     }
+
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
@@ -87,7 +88,7 @@ class WalletControllerTest {
 
         when(walletServiceInterface.deductAmountFromUser(anyString(), any())).thenReturn(walletResponse);
 
-        this.mockMvc.perform(put("/wallet/user/withdraw")
+        this.mockMvc.perform(put("/wallet/withdraw")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(walletRequest)))
                 .andExpect(status().isOk())
@@ -110,7 +111,7 @@ class WalletControllerTest {
             walletResponses.add(walletResponse);
         }
         when(walletServiceInterface.getAllWallets()).thenReturn(walletResponses);
-        MvcResult test1 = mockMvc.perform(get("/wallet/fetchWallets"))
+        MvcResult test1 = mockMvc.perform(get("/wallet/"))
                 .andExpect(status().isOk())
                 .andReturn();
 

@@ -20,6 +20,9 @@ public class UserModel {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String location;
+
     @OneToOne(cascade = CascadeType.ALL)
     private Wallet wallet;
 

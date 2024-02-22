@@ -18,10 +18,10 @@ public class Wallet {
 
     @Embedded
     private Money money;
+    public Wallet() {}
 
-
-    public Wallet() {
-        money = new Money(BigDecimal.ZERO, Currency.INR);
+    public Wallet(Currency currency) {
+        money = new Money(BigDecimal.ZERO, currency);
     }
 
     public void deposit(Money depositmoney) {

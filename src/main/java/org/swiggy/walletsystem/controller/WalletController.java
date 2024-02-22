@@ -27,14 +27,15 @@ public class WalletController {
     @Autowired
     private UserServiceInterface userServiceInterface;
 
-    @PutMapping("/user/deposit")
+    @PutMapping("/deposit")
     public ResponseEntity<WalletResponse> depositAmountToUser(@RequestBody WalletRequest walletRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         return new ResponseEntity<>(walletServiceInterface.addAmountToUser(username, walletRequest), HttpStatus.OK);
     }
-    @PutMapping("/user/withdraw")
+
+    @PutMapping("/withdraw")
     public ResponseEntity<WalletResponse> withdrawAmountFromUser(@RequestBody WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -42,15 +43,7 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletRequest), HttpStatus.OK);
     }
 
-    @PutMapping("user/deposit/toUser")
-    public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        return new ResponseEntity<>(walletServiceInterface.transferAmountToUser(username,    moneyTransferRequest), HttpStatus.OK);
-    }
-
-    @GetMapping("/fetchWallets")
+    @GetMapping("/")
     public List<WalletResponse> fetchWallets() {
         return walletServiceInterface.getAllWallets();
     }

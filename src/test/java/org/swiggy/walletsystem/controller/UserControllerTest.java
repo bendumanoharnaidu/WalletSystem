@@ -3,8 +3,6 @@ package org.swiggy.walletsystem.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,20 +13,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.swiggy.walletsystem.dto.request.UserRequest;
 import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
-import org.swiggy.walletsystem.execptions.UserNotFoundException;
-import org.swiggy.walletsystem.models.entites.Money;
 import org.swiggy.walletsystem.models.entites.UserModel;
-import org.swiggy.walletsystem.models.entites.Wallet;
-import org.swiggy.walletsystem.models.enums.Currency;
 import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.service.UserService;
-import java.math.BigDecimal;
-
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.swiggy.walletsystem.config.SpringSecurityConfig.passwordEncoder;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -85,6 +76,14 @@ class UserControllerTest {
                 .andExpect(status().isOk());
         verify(userService, times(1)).deleteUser("testUser");
     }
+    @Test
+    void testUserDeletionWithoutAuthentication() throws Exception {
+        mockMvc.perform(delete("/user/delete")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+        verify(userService, times(0)).deleteUser("testUser");
+    }
+
 
 
 }
