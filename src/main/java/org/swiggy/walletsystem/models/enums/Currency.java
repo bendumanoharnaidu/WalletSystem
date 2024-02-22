@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 public enum Currency {
 
-    INR(1.00, "India"),
+    INR(1.00, "INDIA"),
     USD(80.00, "USA");
 
     @Getter

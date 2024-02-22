@@ -28,7 +28,8 @@ public class UserService implements UserServiceInterface {
         Currency currency = Currency.getCurrency(userRequest.getLocation());
         UserModel userModel = new UserModel(userRequest.getUsername() ,
                 passwordEncoder.encode(userRequest.getPassword()),
-                new Wallet(currency));
+                new Wallet(currency),
+                userRequest.getLocation());
 
         return userRepository.save(userModel);
     }

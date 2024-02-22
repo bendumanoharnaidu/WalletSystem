@@ -26,10 +26,11 @@ public class UserModel {
     @OneToOne(cascade = CascadeType.ALL)
     private Wallet wallet;
 
-    public UserModel(String username, String password, Wallet wallet) {
+    public UserModel(String username, String password, Wallet wallet, String location) {
         this.username = username;
         this.password = password;
         this.wallet = wallet;
+        this.location = location;
     }
 
 }
