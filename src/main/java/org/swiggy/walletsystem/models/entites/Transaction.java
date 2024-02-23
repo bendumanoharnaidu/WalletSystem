@@ -29,6 +29,14 @@ public class Transaction {
     @Column(name = "date")
     private LocalDateTime date;
 
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "serviceChargeAmount")),
+            @AttributeOverride(name = "currency", column = @Column(name = "serviceChargeCurrency"))
+    })
+    private Money serviceCharge;
+
     @Builder.Default
     @Column(name = "isActive")
     private boolean isActive=true;

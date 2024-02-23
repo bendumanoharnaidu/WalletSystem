@@ -40,7 +40,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/add-wallet-to-user")
+    @PostMapping("/add-wallet")
     public ResponseEntity<UserModel> addWalletToUser() throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

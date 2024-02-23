@@ -100,27 +100,37 @@ public class WalletService implements WalletServiceInterface {
             UserModel user = currentUser.get();
             UserModel otherUserModel = otherUser.get();
 
+            Transaction transaction = Transaction.builder()
+                    .sender(user)
+                    .receiver(otherUserModel)
+                    .date(LocalDateTime.now())
+                    .build();
+
             List<Wallet> currentUserWallets = user.getWallets();
             List<Wallet> otherUserWallets = otherUserModel.getWallets();
-            Wallet currentUserWallet = walletRepository.findById(moneyTransferRequest.getFromWalletId()).get();
+            Wallet currentUserWallet = walletRepository.findById(moneyTransferRequest.getFromWalletId()).get();//10
             Wallet otherUserWallet = walletRepository.findById(moneyTransferRequest.getToWalletId()).get();
 
             if (currentUserWallets.contains(currentUserWallet) && otherUserWallets.contains(otherUserWallet)) {
+
+                if (currentUserWallet.getMoney().getCurrency() != otherUserWallet.getMoney().getCurrency() ) {
+                    Money serviceCharge = new Money(BigDecimal.valueOf(10.0),Currency.INR);
+                    currentUserWallet.withdraw(serviceCharge);
+                    transaction.setServiceCharge(serviceCharge);
+                }
+
                 if (currentUserWallet.getMoney().getAmount().compareTo(BigDecimal.valueOf(moneyTransferRequest.getAmount())) < 0) {
+
                     throw new InsufficientMoneyException("Insufficient balance");
                 }
+
                 currentUserWallet.withdraw(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
                 otherUserWallet.deposit(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
                 walletRepository.save(currentUserWallet);
                 walletRepository.save(otherUserWallet);
                 // save transaction
                 Money money = new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency()));
-                Transaction transaction = Transaction.builder()
-                        .sender(user)
-                        .receiver(otherUserModel)
-                        .money(money)
-                        .date(LocalDateTime.now())
-                        .build();
+
                 transactionRepository.save(transaction);
 
                 return new MoneyTransferResponse("Amount transferred successfully");

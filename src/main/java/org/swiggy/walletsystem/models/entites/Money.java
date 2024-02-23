@@ -1,19 +1,25 @@
 package org.swiggy.walletsystem.models.entites;
+
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.models.enums.Currency;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
+@Embeddable
 public class Money {
 
     private BigDecimal amount ;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     public void deposit(Money depositAmount) {

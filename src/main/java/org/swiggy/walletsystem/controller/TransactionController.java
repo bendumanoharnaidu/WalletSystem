@@ -15,14 +15,14 @@ import org.swiggy.walletsystem.service.TransactionService;
 import org.swiggy.walletsystem.service.WalletServiceInterface;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
     @Autowired
     private WalletServiceInterface walletServiceInterface;
 
-    @PutMapping("/amount-transfer")
+    @PutMapping("/transfer")
     public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -30,15 +30,15 @@ public class TransactionController {
         return new ResponseEntity<>(walletServiceInterface.transferAmountToUser(username,    moneyTransferRequest), HttpStatus.OK);
     }
 
-    @GetMapping("/transfer-history")
+    @GetMapping("/transactions")
     public ResponseEntity<TransactionResponse> allTransactions() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return new ResponseEntity<>(transactionService.fetchallTransactions(username), HttpStatus.OK);
     }
     
-    @GetMapping("/transfer-history/range")
-    public ResponseEntity<TransactionResponse> transactionsBetween(@RequestParam String start, @RequestParam String end) {
+    @GetMapping("/transaction/range")
+    public ResponseEntity<TransactionResponse> transactionsBetween(@RequestParam String start, String end) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 

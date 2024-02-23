@@ -27,12 +27,12 @@ public class UserModel {
     @Column(nullable = false)
     private String location;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Wallet> wallets;
+
     @Builder.Default
     @Column(name = "isActive")
     private boolean isActive=true;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Wallet> wallets;
 
     public UserModel(String username, String password, Wallet wallet, String location) {
         this.username = username;

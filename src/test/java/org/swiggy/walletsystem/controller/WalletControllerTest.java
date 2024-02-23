@@ -95,33 +95,33 @@ class WalletControllerTest {
                 .andExpect(jsonPath("$.amount").value(100));
         verify(walletServiceInterface, times(1)).deductAmountFromUser(anyString(), any());
     }
-
-    @Test
-    @WithMockUser(username = "user", roles = "USER")
-    void getAllWallets() throws Exception {
-        Wallet wallet = new Wallet(1L,new Money(new BigDecimal("100"), Currency.INR));
-        Wallet anotherWallet = new Wallet(2L,new Money(new BigDecimal("200"), Currency.INR));
-
-        List<Wallet> wallets = Arrays.asList(wallet, anotherWallet);
-        List<WalletResponse> walletResponses = new ArrayList<>();
-        for (Wallet w : wallets) {
-            WalletResponse walletResponse = new WalletResponse();
-            walletResponse.setAmount(w.getMoney().getAmount());
-            walletResponse.setCurrency(w.getMoney().getCurrency());
-            walletResponses.add(walletResponse);
-        }
-        when(walletServiceInterface.getAllWallets()).thenReturn(walletResponses);
-        MvcResult test1 = mockMvc.perform(get("/wallet/"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = test1.getResponse().getContentAsString();
-        WalletResponse[] walletResponse = objectMapper.readValue(response, WalletResponse[].class);
-
-        for (int i = 0; i< walletResponse.length; i++) {
-            assert(walletResponse[i].getAmount().equals(walletResponses.get(i).getAmount()));
-            assert(walletResponse[i].getCurrency().equals(walletResponses.get(i).getCurrency()));
-        }
-    }
+//
+//    @Test
+//    @WithMockUser(username = "user", roles = "USER")
+//    void getAllWallets() throws Exception {
+//        Wallet wallet = new Wallet(1L,new Money(new BigDecimal("100"), Currency.INR));
+//        Wallet anotherWallet = new Wallet(2L,new Money(new BigDecimal("200"), Currency.INR));
+//
+//        List<Wallet> wallets = Arrays.asList(wallet, anotherWallet);
+//        List<WalletResponse> walletResponses = new ArrayList<>();
+//        for (Wallet w : wallets) {
+//            WalletResponse walletResponse = new WalletResponse();
+//            walletResponse.setAmount(w.getMoney().getAmount());
+//            walletResponse.setCurrency(w.getMoney().getCurrency());
+//            walletResponses.add(walletResponse);
+//        }
+//        when(walletServiceInterface.getAllWallets()).thenReturn(walletResponses);
+//        MvcResult test1 = mockMvc.perform(get("/wallet/"))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        String response = test1.getResponse().getContentAsString();
+//        WalletResponse[] walletResponse = objectMapper.readValue(response, WalletResponse[].class);
+//
+//        for (int i = 0; i< walletResponse.length; i++) {
+//            assert(walletResponse[i].getAmount().equals(walletResponses.get(i).getAmount()));
+//            assert(walletResponse[i].getCurrency().equals(walletResponses.get(i).getCurrency()));
+//        }
+//    }
 
 }

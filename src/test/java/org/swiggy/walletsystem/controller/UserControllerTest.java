@@ -13,9 +13,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.swiggy.walletsystem.dto.request.UserRequest;
 import org.swiggy.walletsystem.execptions.UserAlreadyPresentException;
+import org.swiggy.walletsystem.models.entites.Money;
 import org.swiggy.walletsystem.models.entites.UserModel;
+import org.swiggy.walletsystem.models.entites.Wallet;
+import org.swiggy.walletsystem.models.enums.Currency;
 import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.service.UserService;
+
+import java.math.BigDecimal;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,8 +48,9 @@ class UserControllerTest {
     }
     @Test
     void testUserRegistration() throws Exception {
-        UserRequest userRequest = new UserRequest("testUser", "password");
-        UserModel userModel = new UserModel("testUser", passwordEncoder.encode("password"), null);
+        UserRequest userRequest = new UserRequest("testUser", "password", "INDIA");
+        Wallet wallet = new Wallet();
+        UserModel userModel = new UserModel("testUser", passwordEncoder.encode("password"), null,"INDIA");
         userRepository.save(userModel);
 
         when(userService.registerUser(userRequest)).thenReturn(userModel);
@@ -58,7 +65,7 @@ class UserControllerTest {
     }
     @Test
     void testUserAlreadyPresent() throws Exception {
-        UserRequest userRequest = new UserRequest("testUser", "password");
+        UserRequest userRequest = new UserRequest("testUser", "password", "INDIA");
         when(userService.registerUser(userRequest)).thenThrow(UserAlreadyPresentException.class);
         mockMvc.perform(post("/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +76,7 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "testUser")
     void testUserDeletion() throws Exception {
-        UserModel userModel = new UserModel("testUser", passwordEncoder.encode("password"), null);
+        UserModel userModel = new UserModel("testUser", passwordEncoder.encode("password"), null,"INDIA");
         userRepository.save(userModel);
         mockMvc.perform(delete("/user/delete")
                         .contentType(MediaType.APPLICATION_JSON))

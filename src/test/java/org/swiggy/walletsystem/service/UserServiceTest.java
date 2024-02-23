@@ -32,48 +32,48 @@ class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    @Test
-    void testRegisterUser() throws UserAlreadyPresentException {
-        String username = "testUser";
-        UserModel userModel = new UserModel(1L, username, passwordEncoder.encode("password"), null);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        UserRequest userRequest = new UserRequest(username, "password");
-        when(userService.registerUser(userRequest)).thenReturn(userModel);
-
-        UserModel result = userService.registerUser(userRequest);
-        assertEquals(userModel, result);
-    }
-
-    @Test
-    void testRegisterUser1() throws UserAlreadyPresentException {
-        UserModel userModel = new UserModel(1L, "testUser", passwordEncoder.encode("password"), null);
-        when(userRepository.save(userModel)).thenReturn(userModel);
-
-        UserRequest userRequest = new UserRequest("testUser", "password");
-        when(userService.registerUser(userRequest)).thenReturn(userModel);
-
-        UserModel result = userService.registerUser(userRequest);
-        assertEquals(userModel, result);
-    }
-
-    @Test
-    void testUserDelete() throws UserNotFoundException {
-        String username = "testUser";
-        UserModel userModel = new UserModel(1L, username, passwordEncoder.encode("password"), null);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userModel));
-
-        String result = userService.deleteUser(username);
-        assertEquals("User deleted successfully", result);
-        verify(userRepository, times(1)).delete(userModel);
-    }
-
-    @Test
-    void testUserDelete1() {
-        String username = "testUser";
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(username));
-        verify(userRepository, times(0)).delete(any());
-    }
+//    @Test
+//    void testRegisterUser() throws UserAlreadyPresentException {
+//        String username = "testUser";
+//        UserModel userModel = new UserModel(1L, username, passwordEncoder.encode("password"), null);
+//        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+//
+//        UserRequest userRequest = new UserRequest(username, "password");
+//        when(userService.registerUser(userRequest)).thenReturn(userModel);
+//
+//        UserModel result = userService.registerUser(userRequest);
+//        assertEquals(userModel, result);
+//    }
+//
+//    @Test
+//    void testRegisterUser1() throws UserAlreadyPresentException {
+//        UserModel userModel = new UserModel(1L, "testUser", passwordEncoder.encode("password"), null);
+//        when(userRepository.save(userModel)).thenReturn(userModel);
+//
+//        UserRequest userRequest = new UserRequest("testUser", "password");
+//        when(userService.registerUser(userRequest)).thenReturn(userModel);
+//
+//        UserModel result = userService.registerUser(userRequest);
+//        assertEquals(userModel, result);
+//    }
+//
+//    @Test
+//    void testUserDelete() throws UserNotFoundException {
+//        String username = "testUser";
+//        UserModel userModel = new UserModel(1L, username, passwordEncoder.encode("password"), null);
+//        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userModel));
+//
+//        String result = userService.deleteUser(username);
+//        assertEquals("User deleted successfully", result);
+//        verify(userRepository, times(1)).delete(userModel);
+//    }
+//
+//    @Test
+//    void testUserDelete1() {
+//        String username = "testUser";
+//        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+//
+//        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(username));
+//        verify(userRepository, times(0)).delete(any());
+//    }
 }

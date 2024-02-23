@@ -18,7 +18,7 @@ import org.swiggy.walletsystem.service.WalletServiceInterface;
 import java.util.List;
 
 @RestController
-@RequestMapping("/wallet")
+@RequestMapping("/wallets")
 public class WalletController {
 
     @Autowired
@@ -43,7 +43,7 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletRequest), HttpStatus.OK);
     }
 
-    @GetMapping("/user-wallets")
+    @GetMapping("")
     public List<WalletResponse> fetchWallets(@RequestParam String username) {
         return walletServiceInterface.getAllWallets(username);
     }
