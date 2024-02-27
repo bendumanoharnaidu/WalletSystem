@@ -12,6 +12,7 @@ import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.dto.request.WalletRequest;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
+import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.service.UserServiceInterface;
 import org.swiggy.walletsystem.service.WalletServiceInterface;
 
@@ -27,25 +28,34 @@ public class WalletController {
     @Autowired
     private UserServiceInterface userServiceInterface;
 
-    @PutMapping("/deposit")
-    public ResponseEntity<WalletResponse> depositAmountToUser(@RequestBody WalletRequest walletRequest) {
+    @PutMapping("/{walletId}/deposit")
+    public ResponseEntity<WalletResponse> depositAmountToUser(@PathVariable Long walletId, @RequestBody WalletRequest walletRequest) throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        return new ResponseEntity<>(walletServiceInterface.addAmountToUser(username, walletRequest), HttpStatus.OK);
+        return new ResponseEntity<>(walletServiceInterface.addAmountToUser(username,walletId, walletRequest), HttpStatus.OK);
     }
 
-    @PutMapping("/withdraw")
-    public ResponseEntity<WalletResponse> withdrawAmountFromUser(@RequestBody WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
+    @PutMapping("/{walletId}/withdraw")
+    public ResponseEntity<WalletResponse> withdrawAmountFromUser(@PathVariable Long walletId, @RequestBody WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletRequest), HttpStatus.OK);
+        return new ResponseEntity<>(walletServiceInterface.deductAmountFromUser(username, walletId, walletRequest), HttpStatus.OK);
     }
 
     @GetMapping("")
-    public List<WalletResponse> fetchWallets(@RequestParam String username) {
-        return walletServiceInterface.getAllWallets(username);
+    public List<WalletResponse> fetchWallets() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return walletServiceInterface.getAllWallets(authentication.getName());
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<UserModel> addWalletToUser() throws UserNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserModel userModel = userServiceInterface.addWalletToUser(username);
+        return new ResponseEntity<>(userModel, HttpStatus.OK);
     }
 
 

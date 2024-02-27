@@ -15,7 +15,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 class WalletTest {
     @Mock
     private Money money;
-
     @InjectMocks
     private Wallet wallet;
     @BeforeEach

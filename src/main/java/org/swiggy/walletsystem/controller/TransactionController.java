@@ -11,34 +11,37 @@ import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.dto.response.TransactionResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
+import org.swiggy.walletsystem.models.entites.UserModel;
+import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.service.TransactionService;
 import org.swiggy.walletsystem.service.WalletServiceInterface;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/transactions")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
     @Autowired
-    private WalletServiceInterface walletServiceInterface;
+    private UserRepository userRepository;
 
-    @PutMapping("/transfer")
+    @PutMapping("/")
     public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+        UserModel userModel = userRepository.findByUsername(username).get();
 
-        return new ResponseEntity<>(walletServiceInterface.transferAmountToUser(username,    moneyTransferRequest), HttpStatus.OK);
+        return new ResponseEntity<>(transactionService.transferAmountToUser(userModel, moneyTransferRequest), HttpStatus.OK);
     }
 
-    @GetMapping("/transactions")
+    @GetMapping("/")
     public ResponseEntity<TransactionResponse> allTransactions() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         return new ResponseEntity<>(transactionService.fetchallTransactions(username), HttpStatus.OK);
     }
     
-    @GetMapping("/transaction/range")
-    public ResponseEntity<TransactionResponse> transactionsBetween(@RequestParam String start, String end) {
+    @GetMapping("")
+    public ResponseEntity<TransactionResponse> transactionsBetween(@RequestParam String start, @RequestParam String end) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 

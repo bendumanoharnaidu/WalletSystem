@@ -12,6 +12,8 @@ import org.swiggy.walletsystem.models.enums.Currency;
 import org.swiggy.walletsystem.models.repository.UserRepository;
 import org.swiggy.walletsystem.models.repository.WalletRepository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 @Service
 public class UserService implements UserServiceInterface {
@@ -26,10 +28,14 @@ public class UserService implements UserServiceInterface {
             throw new UserAlreadyPresentException("User already present");
         }
         Currency currency = Currency.getCurrency(userRequest.getLocation());
-        UserModel userModel = new UserModel(userRequest.getUsername() ,
-                passwordEncoder.encode(userRequest.getPassword()),
-                new Wallet(currency),
-                userRequest.getLocation());
+        UserModel userModel = UserModel.builder()
+                .username(userRequest.getUsername())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
+                .location(userRequest.getLocation())
+                .build();
+        Wallet wallet = new Wallet(currency);
+        wallet.setUsers(userModel);
+        userModel.setWallets(Collections.singletonList(wallet));
 
         return userRepository.save(userModel);
     }
@@ -55,7 +61,9 @@ public class UserService implements UserServiceInterface {
         Optional<UserModel> userModel = userRepository.findByUsername(username);
         if(userModel.isPresent()) {
             UserModel user = userModel.get();
-            user.addWallet(new Wallet(user.getWallets().get(0).getMoney().getCurrency()));
+            Wallet wallet = new Wallet(user.getWallets().get(0).getMoney().getCurrency());
+            wallet.setUsers(user);
+            user.addWallet(wallet);
             return userRepository.save(user);
         }
         else {

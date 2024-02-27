@@ -27,7 +27,7 @@ public class UserModel {
     @Column(nullable = false)
     private String location;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, targetEntity = Wallet.class, fetch = FetchType.LAZY)
     private List<Wallet> wallets;
 
     @Builder.Default

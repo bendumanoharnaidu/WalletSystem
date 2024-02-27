@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletRequest {
-    private Long id;
     private Currency currency;
     private BigDecimal amount;
 }

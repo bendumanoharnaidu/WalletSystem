@@ -27,55 +27,26 @@ public class WalletService implements WalletServiceInterface {
 
     @Autowired
     private WalletRepository walletRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public WalletResponse addAmountToUser(String userName, WalletRequest walletRequest) {
-        Optional<UserModel> optionalUser = userRepository.findByUsername(userName);
-        if(optionalUser.isPresent()){
-            UserModel user = optionalUser.get();
-            List<Wallet> wallets = user.getWallets();
-            Wallet wallet = walletRepository.findById(walletRequest.getId()).get();
-            if(wallets.contains(wallet)) {
-                wallet.deposit(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
-                Wallet returnedWallet = walletRepository.save(wallet);
-                return toDto(returnedWallet);
-            }
-            else {
-                throw new RuntimeException("Wallet not found");
-            }
-        }
-        else {
-            throw new RuntimeException("User not found");
-        }
+    public WalletResponse addAmountToUser(String userName, Long walletId, WalletRequest walletRequest) throws UserNotFoundException {
+        UserModel user = userRepository.findByUsername(userName).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Wallet wallet = walletRepository.findByUserIdAndWalletId(walletId, user.getId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
+        wallet.deposit(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
+        Wallet returnedWallet = walletRepository.save(wallet);
+        return toDto(returnedWallet);
     }
 
     @Override
-    public WalletResponse deductAmountFromUser(String userName, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
-        Optional<UserModel> optionalUser = userRepository.findByUsername(userName);
-        if(optionalUser.isPresent()) {
-            UserModel user = optionalUser.get();
-            List<Wallet> wallets = user.getWallets();
-            Wallet wallet = walletRepository.findById(walletRequest.getId()).get();
-            if(wallets.contains(wallet)) {
-                if (wallet.getMoney().getAmount().compareTo(walletRequest.getAmount()) < 0) {
-                    throw new InsufficientMoneyException("Insufficient balance");
-                }
-                wallet.withdraw(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
-                wallet = walletRepository.save(wallet);
-                return toDto(wallet);
-            }
-            else {
-                throw new RuntimeException("Wallet not found");
-            }
-        }
-        else {
-            throw new UserNotFoundException("User not found");
-        }
+    public WalletResponse deductAmountFromUser(String userName, Long walletId, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
+        UserModel user = userRepository.findByUsername(userName).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Wallet wallet = walletRepository.findByUserIdAndWalletId(walletId, user.getId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
+        wallet.withdraw(new Money(walletRequest.getAmount(), walletRequest.getCurrency()));
+        wallet = walletRepository.save(wallet);
+        return toDto(wallet);
     }
 
     @Override
@@ -91,59 +62,6 @@ public class WalletService implements WalletServiceInterface {
         }
     }
 
-    @Override
-    public MoneyTransferResponse transferAmountToUser(String username, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException {
-        Optional<UserModel> currentUser = userRepository.findByUsername(username);
-        Optional<UserModel> otherUser = userRepository.findByUsername(moneyTransferRequest.getToUser());
-
-        if(currentUser.isPresent() && otherUser.isPresent()) {
-            UserModel user = currentUser.get();
-            UserModel otherUserModel = otherUser.get();
-
-            Transaction transaction = Transaction.builder()
-                    .sender(user)
-                    .receiver(otherUserModel)
-                    .date(LocalDateTime.now())
-                    .build();
-
-            List<Wallet> currentUserWallets = user.getWallets();
-            List<Wallet> otherUserWallets = otherUserModel.getWallets();
-            Wallet currentUserWallet = walletRepository.findById(moneyTransferRequest.getFromWalletId()).get();//10
-            Wallet otherUserWallet = walletRepository.findById(moneyTransferRequest.getToWalletId()).get();
-
-            if (currentUserWallets.contains(currentUserWallet) && otherUserWallets.contains(otherUserWallet)) {
-
-                if (currentUserWallet.getMoney().getCurrency() != otherUserWallet.getMoney().getCurrency() ) {
-                    Money serviceCharge = new Money(BigDecimal.valueOf(10.0),Currency.INR);
-                    currentUserWallet.withdraw(serviceCharge);
-                    transaction.setServiceCharge(serviceCharge);
-                }
-
-                if (currentUserWallet.getMoney().getAmount().compareTo(BigDecimal.valueOf(moneyTransferRequest.getAmount())) < 0) {
-
-                    throw new InsufficientMoneyException("Insufficient balance");
-                }
-
-                currentUserWallet.withdraw(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
-                otherUserWallet.deposit(new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency())));
-                walletRepository.save(currentUserWallet);
-                walletRepository.save(otherUserWallet);
-                // save transaction
-                Money money = new Money(BigDecimal.valueOf(moneyTransferRequest.getAmount()), Currency.valueOf(moneyTransferRequest.getCurrency()));
-
-                transactionRepository.save(transaction);
-
-                return new MoneyTransferResponse("Amount transferred successfully");
-            }
-            else {
-                throw new RuntimeException("Wallet not found");
-            }
-
-        }
-        else {
-            throw new UserNotFoundException("User not found");
-        }
-    }
 
     @Override
     public BigDecimal getAmount(long id) {
@@ -161,5 +79,4 @@ public class WalletService implements WalletServiceInterface {
         walletResponse.setCurrency(wallet.getMoney().getCurrency());
         return walletResponse;
     }
-
 }

@@ -15,19 +15,19 @@ import org.swiggy.walletsystem.models.entites.UserModel;
 import org.swiggy.walletsystem.service.UserServiceInterface;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserServiceInterface userServiceInterface;
 
-    @PostMapping("/register")
+    @PostMapping("/")
     public ResponseEntity<UserModel> registerUser(@RequestBody UserRequest request) throws UserAlreadyPresentException {
         UserModel userModel = userServiceInterface.registerUser(request);
         return new ResponseEntity<>(userModel, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/")
     public ResponseEntity<String> deleteUser() throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -38,14 +38,6 @@ public class UserController {
         else {
             throw new UserNotFoundException("User not found");
         }
-    }
-
-    @PostMapping("/add-wallet")
-    public ResponseEntity<UserModel> addWalletToUser() throws UserNotFoundException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserModel userModel = userServiceInterface.addWalletToUser(username);
-        return new ResponseEntity<>(userModel, HttpStatus.OK);
     }
 
 }

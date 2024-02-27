@@ -6,19 +6,19 @@ import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.dto.response.WalletResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
 import org.swiggy.walletsystem.execptions.UserNotFoundException;
+import org.swiggy.walletsystem.models.entites.UserModel;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface WalletServiceInterface {
 
-    WalletResponse addAmountToUser(String userName, WalletRequest walletRequest);
+    WalletResponse addAmountToUser(String userName,Long walletId, WalletRequest walletRequest) throws UserNotFoundException;
 
-    WalletResponse deductAmountFromUser(String userName, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException;
+    WalletResponse deductAmountFromUser(String userName,Long walletId, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException;
 
     BigDecimal getAmount(long id);
 
     List<WalletResponse> getAllWallets(String username);
-
-    MoneyTransferResponse transferAmountToUser(String username, MoneyTransferRequest moneyTransferRequest) throws UserNotFoundException, InsufficientMoneyException;
 
 }
