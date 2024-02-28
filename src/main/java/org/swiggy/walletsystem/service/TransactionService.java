@@ -46,7 +46,7 @@ public class TransactionService implements TransactionServiceInterface{
         Wallet otherUserWallet = walletRepository.findById(moneyTransferRequest.getToWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
         if (currentUserWallet.getMoney().getCurrency() != otherUserWallet.getMoney().getCurrency() ) {
-            serviceChargeDeduction(moneyTransferRequest, currentUserWallet, otherUserWallet, transaction);
+            convertAndChargeFee(moneyTransferRequest, currentUserWallet, otherUserWallet, transaction);
         }
         else {
             currentUserWallet.withdraw(moneyTransferRequest.getMoney());
@@ -59,10 +59,10 @@ public class TransactionService implements TransactionServiceInterface{
         return new MoneyTransferResponse("Amount transferred successfully");
     }
 
-    private static void serviceChargeDeduction(MoneyTransferRequest moneyTransferRequest, Wallet currentUserWallet, Wallet otherUserWallet, Transaction transaction) throws InsufficientMoneyException {
+    private static void convertAndChargeFee(MoneyTransferRequest moneyTransferRequest, Wallet currentUserWallet, Wallet otherUserWallet, Transaction transaction) throws InsufficientMoneyException {
         ConvertResponse response = CurrencyConversionGrpcClient.convertCurrency(currentUserWallet.getMoney().getCurrency().toString(), otherUserWallet.getMoney().getCurrency().toString(), moneyTransferRequest.getMoney().getAmount().doubleValue());
 
-        Money serviceCharge = new Money(BigDecimal.valueOf(response.getServiceFee()), Currency.valueOf(response.getCurrency()));
+        Money serviceCharge = new Money(BigDecimal.valueOf(response.getServiceFee()), currentUserWallet.getMoney().getCurrency());
         Money amountToBeDeducted = new Money(BigDecimal.valueOf(response.getConvertedAmount()), Currency.valueOf(response.getCurrency()));
 
         currentUserWallet.withdraw(serviceCharge);
