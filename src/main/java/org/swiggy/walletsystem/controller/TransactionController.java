@@ -24,11 +24,11 @@ public class TransactionController {
     @Autowired
     private UserRepository userRepository;
 
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<MoneyTransferResponse> transferAmountToUser(@RequestBody MoneyTransferRequest moneyTransferRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        UserModel userModel = userRepository.findByUsername(username).get();
+        UserModel userModel = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return new ResponseEntity<>(transactionService.transferAmountToUser(userModel, moneyTransferRequest), HttpStatus.OK);
     }

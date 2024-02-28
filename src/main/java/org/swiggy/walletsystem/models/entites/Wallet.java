@@ -40,6 +40,8 @@ public class Wallet {
     @Column(name = "isActive")
     private boolean isActive = true;
 
+
+
     public Wallet() {}
 
     public Wallet(Currency currency) {

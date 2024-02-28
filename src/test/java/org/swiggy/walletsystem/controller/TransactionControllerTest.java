@@ -9,7 +9,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.swiggy.walletsystem.dto.request.MoneyTransferRequest;
 import org.swiggy.walletsystem.dto.response.MoneyTransferResponse;
 import org.swiggy.walletsystem.execptions.InsufficientMoneyException;
@@ -39,36 +43,39 @@ class TransactionControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private TransactionServiceInterface transactionServiceInterface;
+    private TransactionService transactionService;
     @MockBean
     private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         reset();
     }
     @Test
-    void transferAmountToUser() throws UserNotFoundException, InsufficientMoneyException, JsonProcessingException {
+    @WithMockUser(username = "firstUser", password = "password")
+    void transferAmountToUser() throws Exception {
         Money firstUsersMoney = new Money(BigDecimal.valueOf(100), Currency.INR);
         Wallet firstUserWallet = new Wallet(1L, firstUsersMoney, new UserModel("firstUser", "password", new Wallet(), "INDIA"), true);
         UserModel firstUser = new UserModel("firstUser", "password", firstUserWallet, "INDIA");
         userRepository.save(firstUser);
-
+//
         Money secondUsersMoney = new Money(BigDecimal.valueOf(100), Currency.INR);
         Wallet secondUserWallet = new Wallet(2L, secondUsersMoney, new UserModel("secondUser", "password", new Wallet(), "INDIA"), true);
         UserModel secondUser = new UserModel("secondUser", "password", secondUserWallet, "INDIA");
         userRepository.save(secondUser);
 
         MoneyTransferRequest moneyTransferRequest1 = new MoneyTransferRequest(1L, 2L, "secondUser", new Money(BigDecimal.valueOf(50), Currency.INR));
-        MoneyTransferRequest moneyTransferRequest2 = new MoneyTransferRequest(2L, 1L, "firstUser", new Money(BigDecimal.valueOf(50), Currency.INR));
+//        MoneyTransferRequest moneyTransferRequest2 = new MoneyTransferRequest(2L, 1L, "firstUser", new Money(BigDecimal.valueOf(50), Currency.INR));
 
-        when(transactionServiceInterface.transferAmountToUser(firstUser, moneyTransferRequest1)).thenReturn(new MoneyTransferResponse("Amount transferred successfully"));
-        when(transactionServiceInterface.transferAmountToUser(secondUser, moneyTransferRequest2)).thenReturn(new MoneyTransferResponse("Amount transferred successfully"));
+        when(transactionService.transferAmountToUser(firstUser, moneyTransferRequest1)).thenReturn(new MoneyTransferResponse("Amount transferred successfully"));
+//        when(transactionService.transferAmountToUser(secondUser, moneyTransferRequest2)).thenReturn(new MoneyTransferResponse("Amount transferred successfully"));
 
-//        mockMvc.perform(put("/transactions/")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(moneyTransferRequest1)))
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(objectMapper.writeValueAsString(new MoneyTransferResponse("Amount transferred successfully"))));
+        mockMvc.perform(MockMvcRequestBuilders.put("/transactions",moneyTransferRequest1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(moneyTransferRequest1)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(new MoneyTransferResponse("Amount transferred successfully"))));
+
     }
 
     @Test
