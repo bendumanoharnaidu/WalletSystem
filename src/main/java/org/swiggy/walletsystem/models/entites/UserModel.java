@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.swiggy.walletsystem.models.repository.UserRepository;
 
 import java.util.List;
 

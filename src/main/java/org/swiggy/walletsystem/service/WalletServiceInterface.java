@@ -17,8 +17,6 @@ public interface WalletServiceInterface {
 
     WalletResponse deductAmountFromUser(String userName,Long walletId, WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException;
 
-    BigDecimal getAmount(long id);
-
     List<WalletResponse> getAllWallets(String username);
 
 }

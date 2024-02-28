@@ -39,14 +39,7 @@ class WalletServiceTest {
     @InjectMocks
     private WalletService walletService;
 
-    @Test
-    void createWallet() {
-        Wallet wallet = new Wallet();
 
-        when(walletRepository.findById(1L)).thenReturn(Optional.of(wallet));
-        BigDecimal balance = walletService.getAmount(1L);
-        assertEquals(BigDecimal.valueOf(0), balance);
-    }
 
 //    @Test
 //    void testAddAmount() {

@@ -24,15 +24,9 @@ public class UserService implements UserServiceInterface {
     @Autowired
     private PasswordEncoder passwordEncoder;
     public UserModel registerUser(UserRequest userRequest) throws UserAlreadyPresentException {
-        if (isUserPresent(userRequest.getUsername())) {
-            throw new UserAlreadyPresentException("User already present");
-        }
+        if (isUserPresent(userRequest.getUsername())) {throw new UserAlreadyPresentException("User already present");}
         Currency currency = Currency.getCurrency(userRequest.getLocation());
-        UserModel userModel = UserModel.builder()
-                .username(userRequest.getUsername())
-                .password(passwordEncoder.encode(userRequest.getPassword()))
-                .location(userRequest.getLocation())
-                .build();
+        UserModel userModel = UserModel.builder().username(userRequest.getUsername()).password(passwordEncoder.encode(userRequest.getPassword())).location(userRequest.getLocation()).build();
         Wallet wallet = new Wallet(currency);
         wallet.setUsers(userModel);
         userModel.setWallets(Collections.singletonList(wallet));
@@ -47,11 +41,8 @@ public class UserService implements UserServiceInterface {
         Optional<UserModel> userModel = userRepository.findByUsername(username);
         if(userModel.isPresent()) {
             userModel.get().setActive(false);
-//            walletRepository.deleteAll(userModel.get().getWallets());
-//            userRepository.delete(userModel.get());
             return "User deleted successfully";
-        }
-        else {
+        } else {
             throw new UserNotFoundException("User not found");
         }
     }
@@ -65,8 +56,7 @@ public class UserService implements UserServiceInterface {
             wallet.setUsers(user);
             user.addWallet(wallet);
             return userRepository.save(user);
-        }
-        else {
+        } else {
             throw new UserNotFoundException("User not found");
         }
     }

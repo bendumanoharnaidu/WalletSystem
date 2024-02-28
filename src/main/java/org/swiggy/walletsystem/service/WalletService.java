@@ -62,16 +62,6 @@ public class WalletService implements WalletServiceInterface {
         }
     }
 
-
-    @Override
-    public BigDecimal getAmount(long id) {
-        Optional<Wallet> wallet = walletRepository.findById(id);
-        if(wallet.isPresent()){
-            return wallet.get().getMoney().getAmount();
-        }
-        return BigDecimal.ZERO;
-    }
-
     public static WalletResponse toDto(Wallet wallet) {
         WalletResponse walletResponse = new WalletResponse();
         walletResponse.setWalletId(wallet.getId());

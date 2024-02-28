@@ -9,7 +9,6 @@ import org.swiggy.walletsystem.models.entites.UserModel;
 public interface UserServiceInterface {
     public UserModel registerUser(UserRequest userRequest) throws UserAlreadyPresentException;
     public boolean isUserPresent(String username);
-
     public String deleteUser(String username) throws UserNotFoundException;
     public UserModel addWalletToUser(String username) throws UserNotFoundException;
 }
