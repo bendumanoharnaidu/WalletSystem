@@ -29,7 +29,6 @@ public class TransactionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         UserModel userModel = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-
         return new ResponseEntity<>(transactionService.transferAmountToUser(userModel, moneyTransferRequest), HttpStatus.OK);
     }
 
@@ -44,7 +43,6 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> transactionsBetween(@RequestParam String start, @RequestParam String end) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-
         return new ResponseEntity<>(transactionService.fetchTransactionsBetween(username,start,end) , HttpStatus.OK);
     }
 

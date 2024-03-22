@@ -28,7 +28,7 @@ public class WalletController {
     @Autowired
     private UserServiceInterface userServiceInterface;
 
-    @PutMapping("/{walletId}/deposits")
+    @PostMapping("/{walletId}/deposits")
     public ResponseEntity<WalletResponse> depositAmountToUser(@PathVariable Long walletId, @RequestBody WalletRequest walletRequest) throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -36,7 +36,7 @@ public class WalletController {
         return new ResponseEntity<>(walletServiceInterface.addAmountToUser(username,walletId, walletRequest), HttpStatus.OK);
     }
 
-    @PutMapping("/{walletId}/withdraws")
+    @PostMapping("/{walletId}/withdraws")
     public ResponseEntity<WalletResponse> withdrawAmountFromUser(@PathVariable Long walletId, @RequestBody WalletRequest walletRequest) throws InsufficientMoneyException, UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

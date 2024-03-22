@@ -15,7 +15,7 @@ class MoneyTest {
         Money anotherMoney = new Money(new BigDecimal("100"), Currency.INR);
         money.deposit(anotherMoney);
 
-        assertEquals(new Money(new BigDecimal("200"), Currency.INR), money);
+        assertEquals(new Money(new BigDecimal("200.00000"), Currency.INR), money);
     }
     @Test
     void addTwoDifferentMoney() {
@@ -23,7 +23,7 @@ class MoneyTest {
         Money money1 = new Money(new BigDecimal("1"), Currency.USD);
         money.deposit(money1);
 
-        assertEquals(new Money(new BigDecimal("180"), Currency.INR), money);
+        assertEquals(new Money(new BigDecimal("180.00000"), Currency.INR), money);
     }
     @Test
     void moneyWithnegativeAmount() {
@@ -39,7 +39,7 @@ class MoneyTest {
         Money money1 = new Money(new BigDecimal("100"), Currency.INR);
         money.withdraw(money1);
 
-        assertEquals(new Money(new BigDecimal("0"), Currency.INR), money);
+        assertEquals(new Money(new BigDecimal("0.00000"), Currency.INR), money);
     }
 
     @Test
@@ -57,7 +57,7 @@ class MoneyTest {
         Money money = new Money(new BigDecimal("200"), Currency.INR);
         Money money1 = new Money(new BigDecimal("120"), Currency.INR);
         money.withdraw(money1);
-        assertEquals(new Money(new BigDecimal("80"), Currency.INR), money);
+        assertEquals(new Money(new BigDecimal("80.00000"), Currency.INR), money);
 
     }
     @Test

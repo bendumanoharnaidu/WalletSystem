@@ -34,8 +34,7 @@ public class UserController {
         if(authentication.isAuthenticated()) {
             String response = userServiceInterface.deleteUser(username);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        else {
+        } else {
             throw new UserNotFoundException("User not found");
         }
     }

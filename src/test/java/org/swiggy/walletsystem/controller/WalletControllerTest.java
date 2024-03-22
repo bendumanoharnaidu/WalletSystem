@@ -54,7 +54,7 @@ class WalletControllerTest {
 
         when(walletServiceInterface.addAmountToUser("user",1L, walletRequest)).thenReturn(walletResponse);
         String expectedJson = objectMapper.writeValueAsString(walletResponse);
-        this.mockMvc.perform(put("/wallets/1/deposit")
+        this.mockMvc.perform(post("/wallets/1/deposits")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(walletRequest)))
                 .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class WalletControllerTest {
 
         when(walletServiceInterface.deductAmountFromUser("user", 1L,walletRequest)).thenReturn(walletResponse);
 
-        this.mockMvc.perform(put("/wallets/1/withdraw")
+        this.mockMvc.perform(post("/wallets/1/withdraws")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(walletRequest)))
                 .andExpect(status().isOk())
